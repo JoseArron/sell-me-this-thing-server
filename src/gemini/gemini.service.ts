@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { GoogleGenAI } from '@google/genai';
+import { GoogleGenAI, Schema } from '@google/genai';
 
 @Injectable()
 export class GeminiService {
@@ -17,6 +17,35 @@ export class GeminiService {
     prompt: string,
     modelName = 'gemini-2.5-flash',
   ): Promise<string> {
+    const response = await this.client.models.generateContent({
+      model: modelName,
+      contents: [{ parts: [{ text: prompt }] }],
+    });
+    return response.text ?? '';
+  }
+
+  async generateStructuredResponse(
+    prompt: string,
+    schema: Schema,
+    modelName = 'gemini-2.5-flash',
+  ): Promise<string> {
+    const response = await this.client.models.generateContent({
+      model: modelName,
+      contents: [{ role: 'user', parts: [{ text: prompt }] }],
+      config: {
+        responseMimeType: 'application/json',
+        responseSchema: schema,
+      },
+    });
+
+    if (!response.text) {
+      throw new Error('No response text received from Gemini');
+    }
+
+    return response.text;
+  }
+
+  async test(prompt: string, modelName = 'gemini-2.5-flash'): Promise<string> {
     const response = await this.client.models.generateContent({
       model: modelName,
       contents: [{ role: 'user', parts: [{ text: prompt }] }],
