@@ -210,12 +210,14 @@ Return your response as JSON:
       moneyEarned: session.playerMoney,
       finalMessage:
         session.status === 'won'
-          ? `Congratulations! You successfully sold the ${session.product.name} for $${session.product.price}!`
-          : `Game over! The customer left without buying the ${session.product.name}.`,
-      reason:
-        session.status === 'won'
-          ? 'Customer was convinced to make the purchase'
-          : 'Customer ran out of patience or was not convinced',
+          ? `Yey! You successfully sold the ${session.product.name} for $${session.product.price}!`
+          : `Nooo! The customer left without buying the ${session.product.name}.`,
+      reason: `Here's what they said: "${
+        // get last customer message
+        session.conversationHistory
+          .filter((turn) => turn.speaker === 'customer')
+          .slice(-1)[0]?.message
+      }"`,
     };
 
     this.gameSessions.delete(sessionId);

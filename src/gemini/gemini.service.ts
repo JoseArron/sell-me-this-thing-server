@@ -20,6 +20,7 @@ export class GeminiService {
     const response = await this.client.models.generateContent({
       model: modelName,
       contents: [{ parts: [{ text: prompt }] }],
+      config: { thinkingConfig: { thinkingBudget: 0 } }, // disable thinking, faster response
     });
     return response.text ?? '';
   }
@@ -35,6 +36,7 @@ export class GeminiService {
       config: {
         responseMimeType: 'application/json',
         responseSchema: schema,
+        thinkingConfig: { thinkingBudget: 0 },
       },
     });
 
